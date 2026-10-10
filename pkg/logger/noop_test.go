@@ -24,4 +24,7 @@ func TestNoopLogger(t *testing.T) {
 	})
 
 	require.Same(t, l, l.With(tag.String("k", "v")))
+
+	// DebugEnabled reports false because every entry is discarded.
+	require.False(t, l.DebugEnabled())
 }
