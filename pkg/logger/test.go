@@ -104,6 +104,12 @@ func (t *TestLogger) TagsOf(l Level, msg string) map[string]any {
 // Debug implements [Logger] by recording the entry at [LevelDebug].
 func (t *TestLogger) Debug(msg string, tags ...tag.Tag) { t.record(LevelDebug, msg, tags) }
 
+// DebugEnabled implements [Logger]. TestLogger records every level, so Debug
+// entries are always worth building.
+func (t *TestLogger) DebugEnabled() bool {
+	return true
+}
+
 // Error implements [Logger] by recording the entry at [LevelError].
 func (t *TestLogger) Error(msg string, tags ...tag.Tag) { t.record(LevelError, msg, tags) }
 

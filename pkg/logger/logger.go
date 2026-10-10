@@ -29,6 +29,10 @@ type (
 	Logger interface {
 		// Debug logs msg and tags at [LevelDebug].
 		Debug(msg string, tags ...tag.Tag)
+		// DebugEnabled reports whether Debug entries are recorded. Callers on
+		// hot paths may gate the construction of Debug-only tags on it, since
+		// building arguments for an entry that is then discarded allocates.
+		DebugEnabled() bool
 		// Error logs msg and tags at [LevelError].
 		Error(msg string, tags ...tag.Tag)
 		// Fatal logs msg and tags, then typically calls os.Exit(1).

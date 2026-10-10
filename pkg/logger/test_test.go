@@ -19,6 +19,9 @@ func TestTestLoggerContains(t *testing.T) {
 	l.Info("hello")
 	require.True(t, l.Contains("hello"))
 	require.False(t, l.Contains("goodbye"))
+
+	// TestLogger records every level, so Debug entries are always recorded.
+	require.True(t, l.DebugEnabled())
 }
 
 func TestTestLoggerContainsEntry(t *testing.T) {
