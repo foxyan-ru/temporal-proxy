@@ -45,7 +45,10 @@ func BenchmarkTranslator_DescribeNamespaceResponse(b *testing.B) {
 	resp := &workflowservice.DescribeNamespaceResponse{
 		NamespaceInfo: &namespace.NamespaceInfo{Name: "payments-production"},
 	}
-	require.True(b, tr.IsWarm(resp.NamespaceInfo.ProtoReflect().Descriptor().FullName()), "plan for NamespaceInfo must be warm through the response type")
+	// WarmService stores a plan per top-level method input/output type, so the
+	// response type itself is what IsWarm can see; NamespaceInfo's plan lives
+	// inside the response plan's child graph.
+	require.True(b, tr.IsWarm(resp.ProtoReflect().Descriptor().FullName()), "plan for DescribeNamespaceResponse must be warm through WarmService")
 
 	b.ReportAllocs()
 	for b.Loop() {
