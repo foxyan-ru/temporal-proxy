@@ -101,29 +101,34 @@ echo
 echo "=== benchstat ($baseSHA vs $candSHA) ==="
 go run golang.org/x/perf/cmd/benchstat@latest "$WORK/base.txt" "$WORK/cand.txt" | tee "benchstat-$baseSHA-vs-$candSHA.txt"
 
-if [[ -n "$PROFILES" ]]; then
+	if [[ -n "$PROFILES" ]]; then
 	mkdir -p "$PROFILES"
 	for side in base cand; do
 		if [[ $side == base ]]; then ref="$baseSHA"; else ref="$candSHA"; fi
 		dir="$PROFILES/$ref"
 		mkdir -p "$dir"
 		echo "=== profiles for $side ($ref) ===" >&2
-		# -o keeps the test binary next to the profiles, which is what pprof
-		# needs for symbolization.
-		(cd "$WORK/$side" && go test -run '^$' -bench "$BENCH" -count=1 -benchtime "$BENCHTIME" $PKGS \
-			-o "$dir/test.test" \
-			-cpuprofile "$dir/cpu.out" \
-			-memprofile "$dir/heap.out" \
-			-blockprofile "$dir/block.out" \
-			-mutexprofile "$dir/mutex.out") >/dev/null
+		# One package per profile pass: go test -o only accepts a single
+		# package, and -o keeps the test binary next to the profiles, which is
+		# what pprof needs for symbolization.
+		# PKGS is intentionally unquoted: it is a space-separated package list.
+		for pkg in $PKGS; do
+			name="$(echo "$pkg" | tr '/' '-')"
+			(cd "$WORK/$side" && go test -run '^$' -bench "$BENCH" -count=1 -benchtime "$BENCHTIME" "$pkg" \
+				-o "$dir/$name.test" \
+				-cpuprofile "$dir/$name-cpu.out" \
+				-memprofile "$dir/$name-heap.out" \
+				-blockprofile "$dir/$name-block.out" \
+				-mutexprofile "$dir/$name-mutex.out") >/dev/null
 
-		go tool pprof -top -nodecount=25 "$dir/test.test" "$dir/cpu.out" | tee "$dir/cpu-top.txt"
-		go tool pprof -top -nodecount=25 -sample_index=alloc_space "$dir/test.test" "$dir/heap.out" | tee "$dir/heap-top.txt"
-		go tool pprof -top -nodecount=15 "$dir/test.test" "$dir/block.out" | tee "$dir/block-top.txt"
-		go tool pprof -top -nodecount=15 "$dir/test.test" "$dir/mutex.out" | tee "$dir/mutex-top.txt"
-		# Block and mutex profiling are sampling-disabled until enabled; the
-		# test binary enables them under -blockprofile/-mutexprofile, but
-		# rates stay small. Zero tops are normal for short runs.
+			go tool pprof -top -nodecount=25 "$dir/$name.test" "$dir/$name-cpu.out" | tee "$dir/$name-cpu-top.txt"
+			go tool pprof -top -nodecount=25 -sample_index=alloc_space "$dir/$name.test" "$dir/$name-heap.out" | tee "$dir/$name-heap-top.txt"
+			go tool pprof -top -nodecount=15 "$dir/$name.test" "$dir/$name-block.out" | tee "$dir/$name-block-top.txt"
+			go tool pprof -top -nodecount=15 "$dir/$name.test" "$dir/$name-mutex.out" | tee "$dir/$name-mutex-top.txt"
+			# Block and mutex profiling are sampling-disabled until enabled; the
+			# test binary enables them under -blockprofile/-mutexprofile, but
+			# rates stay small. Zero tops are normal for short runs.
+		done
 	done
 	echo "profiles written under $PROFILES"
 fi
