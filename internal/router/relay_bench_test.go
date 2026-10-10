@@ -8,6 +8,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/stretchr/testify/require"
 	"go.temporal.io/api/common/v1"
+	"go.temporal.io/api/taskqueue/v1"
 	"go.temporal.io/api/workflowservice/v1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/test/bufconn"
@@ -45,9 +46,7 @@ func benchUpstreamServer() *grpc.Server {
 					return nil, err
 				}
 
-				return &workflowservice.StartWorkflowExecutionResponse{
-					Run: &common.WorkflowExecution{RunId: benchRunID, WorkflowId: req.WorkflowId},
-				}, nil
+				return &workflowservice.StartWorkflowExecutionResponse{RunId: benchRunID}, nil
 			},
 		}},
 		Streams: []grpc.StreamDesc{},
@@ -70,7 +69,7 @@ func benchRequest() *workflowservice.StartWorkflowExecutionRequest {
 		Namespace:    "payments-production",
 		WorkflowId:   "billing-run-2026-10-10-abc123",
 		WorkflowType: &common.WorkflowType{Name: "billing.daily-run"},
-		TaskQueue:    &common.TaskQueue{Name: "billing-tq"},
+		TaskQueue:    &taskqueue.TaskQueue{Name: "billing-tq"},
 		Input: &common.Payloads{Payloads: []*common.Payload{{
 			Metadata: map[string][]byte{"encoding": []byte("json/plain")},
 			Data:     input,
@@ -89,8 +88,8 @@ func benchInvoke(b *testing.B, conn *grpc.ClientConn, req *workflowservice.Start
 	if err := conn.Invoke(b.Context(), benchMethod, req, resp); err != nil {
 		b.Fatal(err)
 	}
-	if got := resp.GetRun().GetWorkflowId(); got != req.WorkflowId {
-		b.Fatalf("response carried workflow id %q", got)
+	if got := resp.GetRunId(); got != benchRunID {
+		b.Fatalf("response carried run id %q", got)
 	}
 }
 

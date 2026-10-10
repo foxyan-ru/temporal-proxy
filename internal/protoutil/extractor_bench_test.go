@@ -5,6 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 	"go.temporal.io/api/common/v1"
+	"go.temporal.io/api/taskqueue/v1"
 	"go.temporal.io/api/workflowservice/v1"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoregistry"
@@ -26,7 +27,7 @@ func benchStartRequest() *workflowservice.StartWorkflowExecutionRequest {
 		Namespace:    "payments-production",
 		WorkflowId:   "billing-run-2026-10-10-abc123",
 		WorkflowType: &common.WorkflowType{Name: "billing.daily-run"},
-		TaskQueue:    &common.TaskQueue{Name: "billing-tq"},
+		TaskQueue:    &taskqueue.TaskQueue{Name: "billing-tq"},
 		Input: &common.Payloads{Payloads: []*common.Payload{{
 			Metadata: map[string][]byte{"encoding": []byte("json/plain")},
 			Data:     input,
