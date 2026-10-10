@@ -87,6 +87,16 @@ done
 cp "$WORK/base.txt" "bench-$baseSHA.txt"
 cp "$WORK/cand.txt" "bench-$candSHA.txt"
 
+# A side that ran no benchmarks (for example, a base revision without the
+# benchmark files) yields an empty file and a meaningless benchstat table.
+for side in base cand; do
+	if ! grep -q "^Benchmark" "$WORK/$side.txt"; then
+		echo "ERROR: no benchmarks ran on the $side side ($([[ $side == base ]] && echo "$BASE ($baseSHA)" || echo "$CAND ($candSHA)"))." >&2
+		echo "Does that revision contain the benchmark files? Pick two revisions that both have them." >&2
+		exit 1
+	fi
+done
+
 echo
 echo "=== benchstat ($baseSHA vs $candSHA) ==="
 go run golang.org/x/perf/cmd/benchstat@latest "$WORK/base.txt" "$WORK/cand.txt" | tee "benchstat-$baseSHA-vs-$candSHA.txt"
