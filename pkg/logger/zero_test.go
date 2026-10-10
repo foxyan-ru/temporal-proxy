@@ -48,6 +48,30 @@ func TestZeroLoggerLevels(t *testing.T) {
 	}
 }
 
+func TestZeroLoggerDebugEnabled(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name string
+		lvl  logger.Level
+		want bool
+	}{
+		{"debug enables debug", logger.LevelDebug, true},
+		{"info disables debug", logger.LevelInfo, false},
+		{"warn disables debug", logger.LevelWarn, false},
+		{"error disables debug", logger.LevelError, false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			l := logger.NewZeroLogger(&bytes.Buffer{}, tt.lvl)
+			require.Equal(t, tt.want, l.DebugEnabled())
+		})
+	}
+}
+
 func TestZeroLoggerTags(t *testing.T) {
 	t.Parallel()
 

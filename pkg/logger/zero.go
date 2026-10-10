@@ -29,6 +29,12 @@ func (l *ZeroLogger) Debug(msg string, tags ...tag.Tag) {
 	logEvent(l.log.Debug(), msg, tags)
 }
 
+// DebugEnabled implements [Logger], reporting whether the configured level
+// records Debug entries.
+func (l *ZeroLogger) DebugEnabled() bool {
+	return l.log.GetLevel() <= zerolog.DebugLevel
+}
+
 // Error implements [Logger].
 func (l *ZeroLogger) Error(msg string, tags ...tag.Tag) {
 	logEvent(l.log.Error(), msg, tags)
