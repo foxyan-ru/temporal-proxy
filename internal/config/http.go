@@ -14,6 +14,7 @@ type (
 	HTTP struct {
 		Listen      ListenConfig `yaml:",inline"`
 		CodecServer CodecServer  `yaml:"codecServer"`
+		PProf       PProf        `yaml:"pprof"`
 	}
 
 	// routeGroup is a set of routes served by the shared HTTP listener. Each
@@ -42,7 +43,10 @@ func (h *HTTP) Validate() error {
 // groups lists every route group the listener can serve. A new group is a
 // field on HTTP plus an entry here.
 func (h *HTTP) groups() []namedGroup {
-	return []namedGroup{{name: "codecServer", group: &h.CodecServer}}
+	return []namedGroup{
+		{name: "codecServer", group: &h.CodecServer},
+		{name: "pprof", group: &h.PProf},
+	}
 }
 
 // referentialRules checks that every enabled group's external auth names a
