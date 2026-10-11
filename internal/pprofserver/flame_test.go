@@ -157,6 +157,8 @@ func TestSVGEscapesFrameNames(t *testing.T) {
 
 	tree := buildFlame(prof, "count")
 	svg := tree.svg()
-	require.Contains(t, svg, `main<script>`)
+	// The name reaches the SVG only through escaping, and the raw tags never
+	// survive a render.
+	require.Contains(t, svg, "main&lt;script&gt;")
 	require.NotContains(t, svg, "<script>")
 }

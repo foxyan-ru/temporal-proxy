@@ -91,7 +91,9 @@ type (
 func buildFlame(p *profileData, prefer string) *flameTree {
 	idx := pickValueIndex(p.types, prefer)
 	t := &flameTree{
-		root: &flameNode{children: map[string]*flameNode{}},
+		// The root names the whole profile, so the full-width top row has a
+		// label and the top table names the total.
+		root: &flameNode{name: "root", children: map[string]*flameNode{}},
 	}
 	if len(p.types) > 0 {
 		t.valueName = p.types[idx].name

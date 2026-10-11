@@ -67,7 +67,7 @@ func TestLoadPProf(t *testing.T) {
 	t.Parallel()
 
 	cfg, err := config.Load(strings.NewReader(
-		"hostPort: :8080\n"+upstreamYAML+"http:\n  hostPort: 127.0.0.1:8445\n  insecure: true\n"+
+		"hostPort: :8080\n" + upstreamYAML + "http:\n  hostPort: 127.0.0.1:8445\n  insecure: true\n" +
 			"  pprof:\n    enabled: true\n    auth:\n      staticToken:\n        token: s3cret\n",
 	))
 	require.NoError(t, err)

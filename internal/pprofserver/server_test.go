@@ -83,12 +83,12 @@ func TestHandlerRawEndpoints(t *testing.T) {
 
 	h := newHandler()
 
-	// The standard index lists the profile endpoints.
+	// The standard index lists the profile endpoints as relative links.
 	rec := httptest.NewRecorder()
 	h.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, route, nil))
 	require.Equal(t, http.StatusOK, rec.Code)
-	require.Contains(t, rec.Body.String(), route+"heap")
-	require.Contains(t, rec.Body.String(), route+"profile")
+	require.Contains(t, rec.Body.String(), `href="heap?debug=1">heap</a>`)
+	require.Contains(t, rec.Body.String(), `<a href="profile?seconds=`)
 }
 
 func TestHandlerUIPages(t *testing.T) {
