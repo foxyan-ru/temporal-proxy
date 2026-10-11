@@ -20,6 +20,7 @@ import (
 	"github.com/temporalio/temporal-proxy/internal/httpserver"
 	"github.com/temporalio/temporal-proxy/internal/kms"
 	"github.com/temporalio/temporal-proxy/internal/metrics"
+	"github.com/temporalio/temporal-proxy/internal/pprofserver"
 	"github.com/temporalio/temporal-proxy/internal/protoutil"
 	"github.com/temporalio/temporal-proxy/internal/transport/connect"
 	"github.com/temporalio/temporal-proxy/pkg/logger"
@@ -85,6 +86,7 @@ func serve() *cli.Command {
 				httpserver.Module,
 				kms.Module,
 				metrics.Module,
+				pprofserver.Module,
 				protoutil.Module,
 				fx.WithLogger(func(l logger.Logger) fxevent.Logger { return &fxLogger{log: l} }),
 
