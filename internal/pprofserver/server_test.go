@@ -83,12 +83,14 @@ func TestHandlerRawEndpoints(t *testing.T) {
 
 	h := newHandler()
 
-	// The standard index lists the profile endpoints as relative links.
+	// The standard index lists the profile endpoints as relative links. The
+	// quote style around href differs between Go releases, so the assertion
+	// sticks to the part that does not.
 	rec := httptest.NewRecorder()
 	h.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, route, nil))
 	require.Equal(t, http.StatusOK, rec.Code)
-	require.Contains(t, rec.Body.String(), `href="heap?debug=1">heap</a>`)
-	require.Contains(t, rec.Body.String(), `<a href="profile?seconds=`)
+	require.Contains(t, rec.Body.String(), "heap?debug=1")
+	require.Contains(t, rec.Body.String(), "goroutine?debug=1")
 }
 
 func TestHandlerUIPages(t *testing.T) {
