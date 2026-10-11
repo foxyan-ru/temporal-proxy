@@ -146,6 +146,8 @@ func protoHTTPGroup(g meta.HTTPGroup) auth.HTTPTarget_Group {
 	switch g {
 	case meta.HTTPGroupCodecServer:
 		return auth.HTTPTarget_GROUP_CODEC_SERVER
+	case meta.HTTPGroupPProf:
+		return auth.HTTPTarget_GROUP_PPROF
 	default:
 		return auth.HTTPTarget_GROUP_UNSPECIFIED
 	}

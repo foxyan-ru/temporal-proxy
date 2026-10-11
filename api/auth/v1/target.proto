@@ -42,6 +42,9 @@ message HTTPTarget {
     // GROUP_CODEC_SERVER is the codec server, which decodes and encodes
     // payloads for the Temporal UI and CLI.
     GROUP_CODEC_SERVER = 1;
+    // GROUP_PPROF is the pprof routes, which serve the runtime's profiles
+    // under /debug/pprof.
+    GROUP_PPROF = 2;
   }
   // group is the route group the request reached.
   Group group = 1;

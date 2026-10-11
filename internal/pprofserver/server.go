@@ -4,12 +4,9 @@ import (
 	"net/http"
 	netpprof "net/http/pprof"
 
-	"github.com/temporalio/temporal-proxy/internal/api"
 	"github.com/temporalio/temporal-proxy/internal/auth"
-	"github.com/temporalio/temporal-proxy/internal/config"
 	"github.com/temporalio/temporal-proxy/internal/httpserver"
 	"github.com/temporalio/temporal-proxy/internal/transport/meta"
-	"github.com/temporalio/temporal-proxy/pkg/logger"
 	"github.com/temporalio/temporal-proxy/pkg/logger/tag"
 )
 
