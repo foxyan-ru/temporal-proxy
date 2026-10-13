@@ -78,10 +78,10 @@ func (d *director) Resolve(
 	}
 
 	// The decision is already counted in decisions_total; the entry is for an
-	// operator running at debug level. Gating on DebugEnabled keeps requests
-	// at the default level from building the tags an entry they will never
-	// see would carry.
-	if d.logger.DebugEnabled() {
+	// operator running at debug level. Gating on Enabled keeps requests at the
+	// default level from building the tags an entry they will never see would
+	// carry.
+	if d.logger.Enabled(logger.LevelDebug) {
 		d.logger.Debug(
 			"routing request",
 			tag.String("method", method),

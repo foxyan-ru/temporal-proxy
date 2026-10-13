@@ -29,10 +29,15 @@ func (l *ZeroLogger) Debug(msg string, tags ...tag.Tag) {
 	logEvent(l.log.Debug(), msg, tags)
 }
 
-// DebugEnabled implements [Logger], reporting whether the configured level
-// records Debug entries.
-func (l *ZeroLogger) DebugEnabled() bool {
-	return l.log.GetLevel() <= zerolog.DebugLevel
+// Enabled implements [Logger], reporting whether the configured level records
+// entries at lvl. An unrecognized level answers true rather than inheriting
+// [zeroLevel]'s Info mapping, so a bad value never hides logs.
+func (l *ZeroLogger) Enabled(lvl Level) bool {
+	if lvl > LevelError {
+		return true
+	}
+
+	return l.log.GetLevel() <= zeroLevel(lvl)
 }
 
 // Error implements [Logger].

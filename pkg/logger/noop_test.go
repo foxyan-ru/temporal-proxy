@@ -25,6 +25,8 @@ func TestNoopLogger(t *testing.T) {
 
 	require.Same(t, l, l.With(tag.String("k", "v")))
 
-	// DebugEnabled reports false because every entry is discarded.
-	require.False(t, l.DebugEnabled())
+	// Enabled reports false at every level, recognized or not, because every
+	// entry is discarded.
+	require.False(t, l.Enabled(logger.LevelDebug))
+	require.False(t, l.Enabled(logger.Level(42)))
 }
