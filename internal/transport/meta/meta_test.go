@@ -123,6 +123,7 @@ func TestHTTPGroupString(t *testing.T) {
 	}{
 		{group: meta.HTTPGroupUnspecified, want: "unspecified"},
 		{group: meta.HTTPGroupCodecServer, want: "codecServer"},
+		{group: meta.HTTPGroupPProf, want: "pprof"},
 		{group: meta.HTTPGroup(99), want: "HTTPGroup(99)"},
 	}
 
