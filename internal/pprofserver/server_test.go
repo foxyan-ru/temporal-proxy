@@ -91,54 +91,10 @@ func TestHandlerRawEndpoints(t *testing.T) {
 	require.Equal(t, http.StatusOK, rec.Code)
 	require.Contains(t, rec.Body.String(), "heap?debug=1")
 	require.Contains(t, rec.Body.String(), "goroutine?debug=1")
-}
 
-func TestHandlerUIPages(t *testing.T) {
-	t.Parallel()
-
-	h := newHandler()
-
-	rec := httptest.NewRecorder()
-	h.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, route+"ui/", nil))
-	require.Equal(t, http.StatusOK, rec.Code)
-	require.Contains(t, rec.Body.String(), `<select name="type">`)
-	require.Contains(t, rec.Body.String(), `<option value="heap">Heap (in use)</option>`)
-
+	// heap has no pattern of its own: the index handler dispatches it, which
+	// is the path the README's curl recipe takes.
 	rec = httptest.NewRecorder()
-	h.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, route+"ui/flame?type=goroutine", nil))
+	h.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, route+"heap", nil))
 	require.Equal(t, http.StatusOK, rec.Code)
-	require.Contains(t, rec.Body.String(), "Goroutines profile")
-	require.Contains(t, rec.Body.String(), "<svg")
-
-	rec = httptest.NewRecorder()
-	h.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, route+"ui/flame?type=nonsense", nil))
-	require.Equal(t, http.StatusBadRequest, rec.Code)
-
-	rec = httptest.NewRecorder()
-	h.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, route+"ui/elsewhere", nil))
-	require.Equal(t, http.StatusNotFound, rec.Code)
-}
-
-func TestHandlerUIFlameHeapWithGC(t *testing.T) {
-	t.Parallel()
-
-	h := newHandler()
-
-	rec := httptest.NewRecorder()
-	h.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, route+"ui/flame?type=heap&gc=1", nil))
-	require.Equal(t, http.StatusOK, rec.Code)
-	require.Contains(t, rec.Body.String(), "Heap (in use) profile")
-	require.Contains(t, rec.Body.String(), "<svg")
-}
-
-func TestCaptureWriter(t *testing.T) {
-	t.Parallel()
-
-	cw := &captureWriter{}
-	cw.Header().Set("Content-Type", "application/octet-stream")
-	n, err := cw.Write([]byte("hello"))
-	require.NoError(t, err)
-	require.Equal(t, 5, n)
-	require.Equal(t, http.StatusOK, cw.code)
-	require.Equal(t, "hello", cw.buf.String())
 }

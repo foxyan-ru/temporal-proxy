@@ -4,11 +4,10 @@ import (
 	"github.com/temporalio/temporal-proxy/pkg/validation"
 )
 
-// PProf configures the pprof routes, which serve the runtime's profiles: the
-// standard net/http/pprof endpoints under /debug/pprof, plus a visualizer that
-// renders one profile as a flame graph. Profiles can name hot code paths, so
-// the routes are off unless enabled, and they belong behind authentication
-// whenever the listener is reachable beyond loopback, which
+// PProf configures the pprof routes, which serve the runtime's profiles on
+// the standard net/http/pprof endpoints under /debug/pprof. Profiles can name
+// hot code paths, so the routes are off unless enabled, and they belong behind
+// authentication whenever the listener is reachable beyond loopback, which
 // [HTTP.Validate] enforces. The listener itself owns the address and TLS.
 type PProf struct {
 	Enabled bool        `yaml:"enabled"`

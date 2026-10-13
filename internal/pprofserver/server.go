@@ -46,10 +46,10 @@ func newFromParams(p Params) ([]httpserver.Route, error) {
 	return []httpserver.Route{{Pattern: route, Handler: authenticate(newHandler())}}, nil
 }
 
-// newHandler builds the mux serving the standard profile endpoints and the
-// visualizer under [route]. Mounting them on a mux of our own rather than
-// letting net/http/pprof register its globals keeps the routes behind the
-// group's authentication and off any other server in the process.
+// newHandler builds the mux serving the standard profile endpoints under
+// [route]. Mounting them on a mux of our own rather than letting
+// net/http/pprof register its globals keeps the routes behind the group's
+// authentication and off any other server in the process.
 func newHandler() http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc(route, netpprof.Index)
@@ -57,7 +57,6 @@ func newHandler() http.Handler {
 	mux.HandleFunc(route+"profile", netpprof.Profile)
 	mux.HandleFunc(route+"symbol", netpprof.Symbol)
 	mux.HandleFunc(route+"trace", netpprof.Trace)
-	mux.Handle(route+"ui/", &uiHandler{})
 
 	return mux
 }

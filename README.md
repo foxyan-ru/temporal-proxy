@@ -88,6 +88,8 @@ reaches a different upstream with no change to the Worker.
   open payloads directly, without a Worker's data converter in the loop. A codec server holds the same KMS unwrap
   permission the proxy itself does, so one that is reachable without authentication is a decryption oracle; see
   [Codec server](#codec-server) for the config and how it is locked down.
+- **Runtime profiling.** Serve the standard pprof endpoints on the HTTP listener under `http.pprof:`, off by default.
+  Pull a profile with `curl` and read it with `go tool pprof`; see [Profiling](#profiling) for the config.
 - **Inbound authentication and authorization.** Optional static-token or JWKS validation on the gateway; off by default.
   For rules neither covers, delegate the decision to an extension server you run. It is told what the call is addressing
   (the gRPC method, and the Namespace the proxy resolved from the request rather than from anything the caller claims),
@@ -220,6 +222,30 @@ authorizer, if a per-Namespace decision matters.
 On a 4xx response from `/decode`, the Temporal Web UI does not surface an error: it renders whatever payload it
 already had rather than the plaintext, so a rejected token or a malformed request looks the same to whoever is
 looking at it as ciphertext the UI has not decoded yet (`binary/encrypted`), not an obvious failure.
+
+## Profiling
+
+The proxy serves the runtime's standard pprof endpoints under `/debug/pprof/` on the HTTP listener, off unless
+`http.pprof.enabled` says otherwise. They speak the stock `net/http/pprof` protocol, so `curl` a profile out and hand
+the bytes to `go tool pprof`:
+
+```sh
+curl -s -H "Authorization: Bearer $TOKEN" -o heap.pb.gz http://127.0.0.1:8080/debug/pprof/heap
+go tool pprof -http=: heap.pb.gz
+```
+
+`go tool pprof` can also pull from a running proxy directly, using the URL in place of the file:
+`go tool pprof -http=: http://127.0.0.1:8080/debug/pprof/heap`. Without `http.pprof.auth` (allowed only on a
+loopback bind), reach a remote proxy through a tunnel instead: `ssh -L 8080:localhost:8080 <host>`, then the same
+command against `localhost`.
+
+| Key                  | Default | Meaning                                                                                                     |
+| -------------------- | ------- | ----------------------------------------------------------------------------------------------------------- |
+| `http.pprof.enabled` | `false` | Turns the pprof routes on.                                                                                  |
+| `http.pprof.auth`    | none    | Static-token or JWKS authentication. Required, along with `http.tls`, once `http.hostPort` is not loopback. |
+
+Profiles name hot code paths in the proxy itself, which is why the routes are off unless enabled and why validation
+requires `auth` the moment the listener is reachable beyond loopback.
 
 ## Metrics
 
