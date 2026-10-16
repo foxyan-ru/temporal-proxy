@@ -7,8 +7,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/stretchr/testify/require"
-	"go.temporal.io/api/common/v1"
-	"go.temporal.io/api/taskqueue/v1"
 	"go.temporal.io/api/workflowservice/v1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/test/bufconn"
@@ -21,13 +19,13 @@ import (
 	"github.com/temporalio/temporal-proxy/internal/router"
 	"github.com/temporalio/temporal-proxy/internal/server"
 	"github.com/temporalio/temporal-proxy/internal/services"
+	"github.com/temporalio/temporal-proxy/internal/testutils"
 )
 
 const (
-	benchService   = "temporal.api.workflowservice.v1.WorkflowService"
-	benchMethod    = "/" + benchService + "/StartWorkflowExecution"
-	benchRunID     = "0198f4a2-c0de-7f31-a5b2-9e11d1c2a3b4"
-	benchInputSize = 1024
+	benchService = "temporal.api.workflowservice.v1.WorkflowService"
+	benchMethod  = "/" + benchService + "/StartWorkflowExecution"
+	benchRunID   = "0198f4a2-c0de-7f31-a5b2-9e11d1c2a3b4"
 )
 
 // benchUpstreamServer returns a gRPC server that answers StartWorkflowExecution
@@ -55,27 +53,6 @@ func benchUpstreamServer() *grpc.Server {
 	srv := grpc.NewServer()
 	srv.RegisterService(&desc, nil)
 	return srv
-}
-
-// benchRequest builds the same request shape the extractor benchmark uses, so
-// the per-stage and whole-path numbers describe one payload.
-func benchRequest() *workflowservice.StartWorkflowExecutionRequest {
-	input := make([]byte, benchInputSize)
-	for i := range input {
-		input[i] = byte('a' + i%26)
-	}
-
-	return &workflowservice.StartWorkflowExecutionRequest{
-		Namespace:    "payments-production",
-		WorkflowId:   "billing-run-2026-10-10-abc123",
-		WorkflowType: &common.WorkflowType{Name: "billing.daily-run"},
-		TaskQueue:    &taskqueue.TaskQueue{Name: "billing-tq"},
-		Input: &common.Payloads{Payloads: []*common.Payload{{
-			Metadata: map[string][]byte{"encoding": []byte("json/plain")},
-			Data:     input,
-		}}},
-		Identity: "1@worker-7",
-	}
 }
 
 // benchInvoke runs one unary call and checks the response survived the round
@@ -145,7 +122,7 @@ func benchRelayConn(b *testing.B) *grpc.ClientConn {
 // BenchmarkUnaryDirect: the difference is what the proxy adds per unary call.
 func BenchmarkUnaryThroughProxy(b *testing.B) {
 	conn := benchRelayConn(b)
-	req := benchRequest()
+	req := testutils.StartWorkflowRequest()
 	benchInvoke(b, conn, req)
 
 	b.ReportAllocs()
@@ -165,7 +142,7 @@ func BenchmarkUnaryDirect(b *testing.B) {
 	conn := dialBufconn(b, upstreamLis)
 	b.Cleanup(func() { _ = conn.Close() })
 
-	req := benchRequest()
+	req := testutils.StartWorkflowRequest()
 	benchInvoke(b, conn, req)
 
 	b.ReportAllocs()
