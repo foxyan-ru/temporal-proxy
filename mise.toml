@@ -6,6 +6,7 @@ lockfile = true
 [tools]
 "github:mattn/goreman" = "latest"
 "github:temporalio/cli" = "latest"
+"go:golang.org/x/perf/cmd/benchstat" = "latest"
 buf = "1.72"
 go = "1.27"
 golangci-lint = "2.13"
