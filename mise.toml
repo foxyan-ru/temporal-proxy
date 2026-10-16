@@ -121,15 +121,6 @@ run = ["buf format -w"]
 description = "Run unit tests"
 run = "go test -race -covermode=atomic -coverprofile=coverage.out ./..."
 
-[tasks."test:bench"]
-description = "Run bench tests"
-usage = '''
-flag "-c --count <count>" default="3"
-flag "-t --time <time>" default="1s"
-flag "-p --packages <packages>" default="./..."
-'''
-run = "go test -run='^$' -bench=. -benchmem -count=${usage_count?} -benchtime=${usage_time?} ${usage_packages?}"
-
 ################################################################################
 # Code Gen Tasks
 ################################################################################
