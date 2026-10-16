@@ -4,37 +4,13 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"go.temporal.io/api/common/v1"
-	"go.temporal.io/api/taskqueue/v1"
 	"go.temporal.io/api/workflowservice/v1"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoregistry"
 
 	"github.com/temporalio/temporal-proxy/internal/protoutil"
+	"github.com/temporalio/temporal-proxy/internal/testutils"
 )
-
-// benchStartRequest builds a StartWorkflowExecutionRequest shaped like the ones
-// SDK clients send: identity fields, a typed workflow, and a 1 KiB input
-// payload, so extraction measures a realistic unmarshal rather than a
-// two-field toy message.
-func benchStartRequest() *workflowservice.StartWorkflowExecutionRequest {
-	input := make([]byte, 1024)
-	for i := range input {
-		input[i] = byte('a' + i%26)
-	}
-
-	return &workflowservice.StartWorkflowExecutionRequest{
-		Namespace:    "payments-production",
-		WorkflowId:   "billing-run-2026-10-10-abc123",
-		WorkflowType: &common.WorkflowType{Name: "billing.daily-run"},
-		TaskQueue:    &taskqueue.TaskQueue{Name: "billing-tq"},
-		Input: &common.Payloads{Payloads: []*common.Payload{{
-			Metadata: map[string][]byte{"encoding": []byte("json/plain")},
-			Data:     input,
-		}}},
-		Identity: "1@worker-7",
-	}
-}
 
 func benchMarshal(b *testing.B, m proto.Message) []byte {
 	b.Helper()
@@ -45,7 +21,7 @@ func benchMarshal(b *testing.B, m proto.Message) []byte {
 }
 
 func BenchmarkExtractor_NamespacedRequest(b *testing.B) {
-	payload := benchMarshal(b, benchStartRequest())
+	payload := benchMarshal(b, testutils.StartWorkflowRequest())
 	ex := protoutil.NewExtractor(protoregistry.GlobalFiles, protoregistry.GlobalTypes)
 	require.Equal(b, "payments-production", ex.Namespace(startMethod, payload), "warm-up call must extract the namespace")
 
