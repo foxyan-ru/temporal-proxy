@@ -18,6 +18,12 @@ func NewNoopLogger() *NoopLogger {
 func (n *NoopLogger) Debug(string, ...tag.Tag) {
 }
 
+// Enabled implements [Logger]. NoopLogger discards every entry, whatever the
+// level, so nothing it could log is worth building.
+func (n *NoopLogger) Enabled(Level) bool {
+	return false
+}
+
 // Error implements [Logger] by discarding the entry.
 func (n *NoopLogger) Error(string, ...tag.Tag) {
 }
