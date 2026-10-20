@@ -5,8 +5,8 @@ import (
 
 	"google.golang.org/grpc"
 
-	"github.com/temporalio/temporal-proxy/internal/config"
-	"github.com/temporalio/temporal-proxy/internal/router"
+	"go.temporal.io/proxy/internal/config"
+	"go.temporal.io/proxy/internal/router"
 )
 
 // BenchmarkDirector_Resolve measures the routing decision including the

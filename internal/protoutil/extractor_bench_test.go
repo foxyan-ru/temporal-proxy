@@ -8,8 +8,8 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoregistry"
 
-	"github.com/temporalio/temporal-proxy/internal/protoutil"
-	"github.com/temporalio/temporal-proxy/internal/testutils"
+	"go.temporal.io/proxy/internal/protoutil"
+	"go.temporal.io/proxy/internal/testutils"
 )
 
 func benchMarshal(b *testing.B, m proto.Message) []byte {

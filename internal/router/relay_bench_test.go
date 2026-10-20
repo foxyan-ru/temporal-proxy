@@ -12,14 +12,14 @@ import (
 	"google.golang.org/grpc/test/bufconn"
 	"google.golang.org/protobuf/reflect/protoregistry"
 
-	"github.com/temporalio/temporal-proxy/internal/config"
-	"github.com/temporalio/temporal-proxy/internal/metrics"
-	"github.com/temporalio/temporal-proxy/internal/protoutil"
-	"github.com/temporalio/temporal-proxy/internal/proxy"
-	"github.com/temporalio/temporal-proxy/internal/router"
-	"github.com/temporalio/temporal-proxy/internal/server"
-	"github.com/temporalio/temporal-proxy/internal/services"
-	"github.com/temporalio/temporal-proxy/internal/testutils"
+	"go.temporal.io/proxy/internal/config"
+	"go.temporal.io/proxy/internal/metrics"
+	"go.temporal.io/proxy/internal/protoutil"
+	"go.temporal.io/proxy/internal/proxy"
+	"go.temporal.io/proxy/internal/router"
+	"go.temporal.io/proxy/internal/server"
+	"go.temporal.io/proxy/internal/services"
+	"go.temporal.io/proxy/internal/testutils"
 )
 
 const (

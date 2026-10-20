@@ -8,8 +8,8 @@ import (
 	"go.temporal.io/api/workflowservice/v1"
 	"google.golang.org/protobuf/reflect/protoregistry"
 
-	"github.com/temporalio/temporal-proxy/internal/protoutil"
-	"github.com/temporalio/temporal-proxy/internal/testutils"
+	"go.temporal.io/proxy/internal/protoutil"
+	"go.temporal.io/proxy/internal/testutils"
 )
 
 func BenchmarkTranslator_StartWorkflowRequest(b *testing.B) {
