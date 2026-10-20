@@ -32,6 +32,9 @@ const (
 	// GROUP_CODEC_SERVER is the codec server, which decodes and encodes
 	// payloads for the Temporal UI and CLI.
 	HTTPTarget_GROUP_CODEC_SERVER HTTPTarget_Group = 1
+	// GROUP_PPROF is the pprof routes, which serve the runtime's profiles
+	// under /debug/pprof.
+	HTTPTarget_GROUP_PPROF HTTPTarget_Group = 2
 )
 
 // Enum value maps for HTTPTarget_Group.
@@ -39,10 +42,12 @@ var (
 	HTTPTarget_Group_name = map[int32]string{
 		0: "GROUP_UNSPECIFIED",
 		1: "GROUP_CODEC_SERVER",
+		2: "GROUP_PPROF",
 	}
 	HTTPTarget_Group_value = map[string]int32{
 		"GROUP_UNSPECIFIED":  0,
 		"GROUP_CODEC_SERVER": 1,
+		"GROUP_PPROF":        2,
 	}
 )
 
@@ -227,16 +232,17 @@ const file_api_auth_v1_target_proto_rawDesc = "" +
 	"\x06Target\x12\x1b\n" +
 	"\tfull_name\x18\x01 \x01(\tR\bfullName\x12\x1c\n" +
 	"\tnamespace\x18\x02 \x01(\tR\tnamespace\x12+\n" +
-	"\x04http\x18\x03 \x01(\v2\x17.api.auth.v1.HTTPTargetR\x04http\"\xa5\x01\n" +
+	"\x04http\x18\x03 \x01(\v2\x17.api.auth.v1.HTTPTargetR\x04http\"\xb6\x01\n" +
 	"\n" +
 	"HTTPTarget\x123\n" +
 	"\x05group\x18\x01 \x01(\x0e2\x1d.api.auth.v1.HTTPTarget.GroupR\x05group\x12\x16\n" +
 	"\x06method\x18\x02 \x01(\tR\x06method\x12\x12\n" +
-	"\x04path\x18\x03 \x01(\tR\x04path\"6\n" +
+	"\x04path\x18\x03 \x01(\tR\x04path\"G\n" +
 	"\x05Group\x12\x15\n" +
 	"\x11GROUP_UNSPECIFIED\x10\x00\x12\x16\n" +
-	"\x12GROUP_CODEC_SERVER\x10\x01B\xa7\x01\n" +
-	"\x0fcom.api.auth.v1B\vTargetProtoP\x01Z9github.com/temporalio/temporal-proxy/pkg/api/auth/v1;auth\xa2\x02\x03AAX\xaa\x02\vApi.Auth.V1\xca\x02\vApi\\Auth\\V1\xe2\x02\x17Api\\Auth\\V1\\GPBMetadata\xea\x02\rApi::Auth::V1b\x06proto3"
+	"\x12GROUP_CODEC_SERVER\x10\x01\x12\x0f\n" +
+	"\vGROUP_PPROF\x10\x02B\x97\x01\n" +
+	"\x0fcom.api.auth.v1B\vTargetProtoP\x01Z)go.temporal.io/proxy/pkg/api/auth/v1;auth\xa2\x02\x03AAX\xaa\x02\vApi.Auth.V1\xca\x02\vApi\\Auth\\V1\xe2\x02\x17Api\\Auth\\V1\\GPBMetadata\xea\x02\rApi::Auth::V1b\x06proto3"
 
 var (
 	file_api_auth_v1_target_proto_rawDescOnce sync.Once

@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/temporalio/temporal-proxy/internal/config"
+	"go.temporal.io/proxy/internal/config"
 )
 
 func TestHTTPValidate(t *testing.T) {
@@ -94,6 +94,21 @@ func TestHTTPValidate(t *testing.T) {
 				},
 			},
 			wantErr: "codecServer.cors",
+		},
+		{
+			name: "pprof on a loopback bind without auth is allowed",
+			h: config.HTTP{
+				Listen: config.ListenConfig{HostPort: "127.0.0.1:8445", Insecure: true},
+				PProf:  config.PProf{Enabled: true},
+			},
+		},
+		{
+			name: "pprof reachable beyond loopback without auth is rejected",
+			h: config.HTTP{
+				Listen: config.ListenConfig{HostPort: "0.0.0.0:8445", Insecure: true},
+				PProf:  config.PProf{Enabled: true},
+			},
+			wantErr: "pprof",
 		},
 	}
 

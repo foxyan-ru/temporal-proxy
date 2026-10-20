@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/metadata"
 
-	"github.com/temporalio/temporal-proxy/internal/transport/meta"
+	"go.temporal.io/proxy/internal/transport/meta"
 )
 
 func TestWithNamespaceRoundTrips(t *testing.T) {
@@ -123,6 +123,7 @@ func TestHTTPGroupString(t *testing.T) {
 	}{
 		{group: meta.HTTPGroupUnspecified, want: "unspecified"},
 		{group: meta.HTTPGroupCodecServer, want: "codecServer"},
+		{group: meta.HTTPGroupPProf, want: "pprof"},
 		{group: meta.HTTPGroup(99), want: "HTTPGroup(99)"},
 	}
 

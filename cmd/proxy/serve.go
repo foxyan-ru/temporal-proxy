@@ -12,18 +12,19 @@ import (
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/reflect/protoregistry"
 
-	"github.com/temporalio/temporal-proxy/internal/api"
-	"github.com/temporalio/temporal-proxy/internal/auth"
-	"github.com/temporalio/temporal-proxy/internal/codecserver"
-	"github.com/temporalio/temporal-proxy/internal/config"
-	"github.com/temporalio/temporal-proxy/internal/dataplane"
-	"github.com/temporalio/temporal-proxy/internal/httpserver"
-	"github.com/temporalio/temporal-proxy/internal/kms"
-	"github.com/temporalio/temporal-proxy/internal/metrics"
-	"github.com/temporalio/temporal-proxy/internal/protoutil"
-	"github.com/temporalio/temporal-proxy/internal/transport/connect"
-	"github.com/temporalio/temporal-proxy/pkg/logger"
-	"github.com/temporalio/temporal-proxy/pkg/logger/tag"
+	"go.temporal.io/proxy/internal/api"
+	"go.temporal.io/proxy/internal/auth"
+	"go.temporal.io/proxy/internal/codecserver"
+	"go.temporal.io/proxy/internal/config"
+	"go.temporal.io/proxy/internal/dataplane"
+	"go.temporal.io/proxy/internal/httpserver"
+	"go.temporal.io/proxy/internal/kms"
+	"go.temporal.io/proxy/internal/metrics"
+	"go.temporal.io/proxy/internal/pprofserver"
+	"go.temporal.io/proxy/internal/protoutil"
+	"go.temporal.io/proxy/internal/transport/connect"
+	"go.temporal.io/proxy/pkg/logger"
+	"go.temporal.io/proxy/pkg/logger/tag"
 )
 
 // shutdownTimeout bounds the whole stop sequence: the serving tiers, which drain
@@ -57,6 +58,11 @@ func serve() *cli.Command {
 				Value:   "info",
 				Sources: cli.EnvVars("LOG_LEVEL"),
 			},
+			&cli.BoolFlag{
+				Name:    "require-encryption",
+				Usage:   "Refuse to start unless the config has an encryption key (encryption.default)",
+				Sources: cli.EnvVars("PROXY_REQUIRE_ENCRYPTION"),
+			},
 		},
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			log := logger.NewZeroLogger(os.Stderr, logger.ParseLevel(cmd.String("level")))
@@ -80,11 +86,13 @@ func serve() *cli.Command {
 				auth.Module,
 				codecserver.Module,
 				config.Module,
+				config.RequireKey(cmd.Bool("require-encryption")),
 				connect.Module,
 				dataplane.Module,
 				httpserver.Module,
 				kms.Module,
 				metrics.Module,
+				pprofserver.Module,
 				protoutil.Module,
 				fx.WithLogger(func(l logger.Logger) fxevent.Logger { return &fxLogger{log: l} }),
 

@@ -8,8 +8,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/temporalio/temporal-proxy/internal/config"
-	"github.com/temporalio/temporal-proxy/internal/router"
+	"go.temporal.io/proxy/internal/config"
+	"go.temporal.io/proxy/internal/router"
 )
 
 func TestMuxFor(t *testing.T) {
@@ -112,7 +112,7 @@ func TestMuxFor(t *testing.T) {
 
 // prepared returns r after preparing it inside a minimal config with one
 // upstream per name r references.
-func prepared(t *testing.T, r config.Routing) config.Routing {
+func prepared(t testing.TB, r config.Routing) config.Routing {
 	t.Helper()
 
 	names := map[string]struct{}{"primary": {}}

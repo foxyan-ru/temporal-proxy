@@ -8,8 +8,8 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/fx"
 
-	"github.com/temporalio/temporal-proxy/internal/config"
-	"github.com/temporalio/temporal-proxy/internal/services"
+	"go.temporal.io/proxy/internal/config"
+	"go.temporal.io/proxy/internal/services"
 )
 
 func TestModule_ProvidesConfig(t *testing.T) {
@@ -134,4 +134,50 @@ func TestModuleRejectsInvalidFile(t *testing.T) {
 		fx.Invoke(func(*config.Config) {}),
 	)
 	require.ErrorContains(t, app.Err(), "at least one upstream is required")
+}
+
+// TestRequireKey covers the startup guard against a proxy that would forward
+// plaintext. It keys on a configured key, not on enabled, so a decrypt-only
+// proxy (a key with enabled false) still starts.
+func TestRequireKey(t *testing.T) {
+	t.Parallel()
+
+	const key = "  namespaceBinding: strict\n  default:\n    uri: testing://a2V5\n    duration: 1h\n    renewBefore: 10m\n"
+
+	tests := []struct {
+		name    string
+		require bool
+		yaml    string
+		wantErr bool
+	}{
+		{name: "no encryption block", require: true, yaml: "", wantErr: true},
+		{name: "disabled without a key", require: true, yaml: "encryption:\n  enabled: false\n", wantErr: true},
+		{name: "decrypt-only with a key", require: true, yaml: "encryption:\n  enabled: false\n" + key},
+		{name: "enabled with a key", require: true, yaml: "encryption:\n  enabled: true\n" + key},
+		{name: "not required and no key", require: false, yaml: ""},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			path := filepath.Join(t.TempDir(), "config.yaml")
+			require.NoError(t, os.WriteFile(path, []byte("hostPort: :7233\n"+upstreamYAML+tt.yaml), 0o600))
+
+			app := fx.New(
+				fx.NopLogger,
+				fx.Supply(fx.Annotate(path, config.ConfigFileTag)),
+				config.Module,
+				config.RequireKey(tt.require),
+				fx.Invoke(func(*config.Config) {}),
+			)
+
+			if tt.wantErr {
+				require.ErrorContains(t, app.Err(), "encryption: default: a key is required when encryption is required")
+				return
+			}
+
+			require.NoError(t, app.Err())
+		})
+	}
 }
