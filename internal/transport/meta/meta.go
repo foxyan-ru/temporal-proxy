@@ -28,6 +28,8 @@ const (
 	HTTPGroupUnspecified HTTPGroup = iota
 	// HTTPGroupCodecServer is the codec server's routes.
 	HTTPGroupCodecServer
+	// HTTPGroupPProf is the pprof routes.
+	HTTPGroupPProf
 )
 
 type (
@@ -79,7 +81,7 @@ func TargetFrom(ctx context.Context) Target {
 // HTTPGroups returns every declared route group except HTTPGroupUnspecified. A
 // new group is added here alongside its constant.
 func HTTPGroups() []HTTPGroup {
-	return []HTTPGroup{HTTPGroupCodecServer}
+	return []HTTPGroup{HTTPGroupCodecServer, HTTPGroupPProf}
 }
 
 // WithNamespace returns ctx with namespace set on its outgoing gRPC metadata,
@@ -121,6 +123,8 @@ func (g HTTPGroup) String() string {
 		return "unspecified"
 	case HTTPGroupCodecServer:
 		return "codecServer"
+	case HTTPGroupPProf:
+		return "pprof"
 	default:
 		return fmt.Sprintf("HTTPGroup(%d)", int(g))
 	}
